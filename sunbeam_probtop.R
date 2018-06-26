@@ -1,4 +1,3 @@
-
 #'Makes a sunbeam plot
 #'Shows the probability of the input SNP having the lowest p-value
 #'
@@ -40,11 +39,13 @@ sunbeam_probtop<-function(CV1,CV2,SNPint,N0,N1,gammatrue,LD,freq,ORmax=1,ORgrid=
 			#gamma at this point on the grid
 			try_gamma<-c(gamma_list[ii],gamma_list[jj])
 			#expected Z Score at this gamma
-			est_z_score<-abs(est_statistic(N0,N1,snps,c(CV1,CV2),try_gamma,freq,GenoProbList))
+			est_z_score<-est_statistic(N0,N1,snps,c(CV1,CV2),try_gamma,freq,GenoProbList)
 			#prob SNPint comes top
 			if (max(est_z_score)<z_score_sig){
 				prob_SNPint_top[ii,jj]<-0
-			}else{
+			} else if(bound_prob_top(est_z_score[which(snps==SNPint)],max(est_z_score),LD[which.max(est_z_score),which(snps==SNPint)])<0.1){
+				prob_SNPint_top[ii,jj]<-0
+			} else{
 				prob_SNPint_top[ii,jj]<-prob_snp_top(which(snps==SNPint),est_z_score,LD)
 		      	}
 		}
@@ -79,5 +80,29 @@ prob_snp_top<-function(whichsnp,exp_z_score,LD){
 	sim_z_score<-abs(rmvnorm(n=num_itt,mean=exp_z_score,sigma=LD))
 	num_top<-length(which(apply(sim_z_score,1,which.max)==whichsnp))
 	return(num_top/num_itt)
+}
+
+
+##' Internal function, bound_prob_top
+##'
+##' This function takes in the expected top Z score, the expected Z Score at the SNP of interest and their correlation
+##' It computes the probability of SNPint outperforming the expected top SNP
+##' This provides a bound for the probability of SNPint outperforming all SNPs
+##' @title prob_snp_top
+##' @param Zint the expected Z Score of the SNP we are interested in
+##' @param Ztop the highest expected Z Score in the region
+##' @param corr the correlation between these two SNPs
+##' @return the probability that SNPint outperforms the expected top SNP
+##' @author Mary Fortune
+bound_prob_top<-function(Zint,Ztop,corr){
+	if (abs(corr)>=1){
+		prob<-0.5
+	} else if (sign(Zint)==sign(Ztop)){
+		prob<-pnorm((sign(Zint)*Zint-sign(Ztop)*Ztop)/(2-2*corr)^0.5)
+	}
+	else{
+		prob<-pnorm((sign(Zint)*Zint-sign(Ztop)*Ztop)/(2+2*corr)^0.5)
+	}
+	return(prob)
 }
 
