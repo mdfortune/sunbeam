@@ -1,8 +1,9 @@
+
 #'Makes a sunbeam plot
 #'Shows the probability of the input SNP having the lowest p-value
 #'
 #'
-#'@title sunbeam_probtop
+#'@title sunbeam_prob
 #'@export
 #'@param CV1 The first of the true causal SNPs
 #'@param CV2 The second of the true causal SNPs
@@ -25,14 +26,14 @@ sunbeam_probtop<-function(CV1,CV2,SNPint,N0,N1,gammatrue,LD,freq,ORmax=1,ORgrid=
 	if (!setequal(snps,colnames(LD))){stop("Reference data mismatch: the freq data and the LD data do not contain the same SNPs")}
 	if (!is.element(CV1,snps)){stop("CV1 is not in the reference data")}
 	if (!is.element(CV2,snps)){stop("CV2 is not in the reference data")}
-	if (!is.element(XXX,snps)){stop("XXX is not in the reference data")}
+	if (!is.element(SNPint,snps)){stop("SNPint is not in the reference data")}
 	#set up the grid causal models which we will test
 	gamma_list<-seq(-ORmax,ORmax,by=ORgrid)
 	n_gamma<-length(gamma_list)
 	#compute the list of probabilities of genotype given causal SNP genotype
 	GenoProbList<-make_GenoProbList(snps,c(CV1,CV2),freq)
 	#matrix giving the probability that SNPint will be the top SNP at each point on the grid
-	prob_XXX_top<-matrix(-1,n_gamma,n_gamma)
+	prob_SNPint_top<-matrix(-1,n_gamma,n_gamma)
 	#populate top_SNP
 	for (ii in 1:n_gamma){
 		for (jj in 1:n_gamma){
@@ -42,9 +43,9 @@ sunbeam_probtop<-function(CV1,CV2,SNPint,N0,N1,gammatrue,LD,freq,ORmax=1,ORgrid=
 			est_z_score<-abs(est_statistic(N0,N1,snps,c(CV1,CV2),try_gamma,freq,GenoProbList))
 			#prob SNPint comes top
 			if (max(est_z_score)<z_score_sig){
-				prob_XXX_top[ii,jj]<-0
+				prob_SNPint_top[ii,jj]<-0
 			}else{
-				prob_XXX_top[ii,jj]<-prob_snp_top(which(snps==XXX),est_z_score,LD)
+				prob_SNPint_top[ii,jj]<-prob_snp_top(which(snps==SNPint),est_z_score,LD)
 		      	}
 		}
 	}
@@ -53,7 +54,7 @@ sunbeam_probtop<-function(CV1,CV2,SNPint,N0,N1,gammatrue,LD,freq,ORmax=1,ORgrid=
 	#we only want to label the plot at a subset of points
 	subset<-which(abs(round(gamma_list,1)-gamma_list)<0.001)
 	#make the plot, including a point corresponding to gammatrue
-	levelplot(top_SNP,scales=list(x=list(at=subset, labels=gamma_list[subset]),y=list(at=subset, labels=gamma_list[subset])),xlab=list("log OR for CV1",cex=1.5),ylab=list("log OR for CV2",cex=1.5),col.regions=col.l,colorkey=FALSE, 		panel = function(...){
+	levelplot(prob_SNPint_top,scales=list(x=list(at=subset, labels=gamma_list[subset]),y=list(at=subset, labels=gamma_list[subset])),xlab=list("log OR for CV1",cex=1.5),ylab=list("log OR for CV2",cex=1.5),col.regions=col.l,panel = function(...){
 		panel.levelplot(...)
 		panel.abline(h = which(gamma_list==0))
             	panel.abline(v = which(gamma_list==0))
@@ -74,7 +75,7 @@ sunbeam_probtop<-function(CV1,CV2,SNPint,N0,N1,gammatrue,LD,freq,ORmax=1,ORgrid=
 ##' @author Mary Fortune
 prob_snp_top<-function(whichsnp,exp_z_score,LD){
 	num_top<-0
-	num_itt<-10000
+	num_itt<-1000
 	sim_z_score<-abs(rmvnorm(n=num_itt,mean=exp_z_score,sigma=LD))
 	num_top<-length(which(apply(sim_z_score,1,which.max)==whichsnp))
 	return(num_top/num_itt)
