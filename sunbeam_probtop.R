@@ -1,3 +1,4 @@
+
 #'Makes a sunbeam plot
 #'Shows the probability of the input SNP having the lowest p-value
 #'
@@ -18,7 +19,7 @@
 #'@param col_list Which colours to use in the plot
 #'@return a sunbeam plot showing the probability of SNP SNPint having the lowest p-value
 #'@author Mary Fortune
-sunbeam_probtop<-function(CV1,CV2,SNPint,N0,N1,gammatrue,LD,freq,ORmax=1,ORgrid=0.05,z_score_sig=-qnorm((0.1)/2),col_list=c('white', 'purple')){
+sunbeam_probtop<-function(CV1,CV2,SNPint,N0,N1,gammatrue,LD,freq,ORmax=1,ORgrid=0.005,z_score_sig=-qnorm((0.1)/2),col_list=c('white', 'purple')){
 	#get the SNP names
 	snps<-colnames(freq)[-ncol(freq)]
 	#check that the same SNPs are present in the freq data, the LD matrix and the input SNPs
@@ -41,7 +42,7 @@ sunbeam_probtop<-function(CV1,CV2,SNPint,N0,N1,gammatrue,LD,freq,ORmax=1,ORgrid=
 			#expected Z Score at this gamma
 			est_z_score<-est_statistic(N0,N1,snps,c(CV1,CV2),try_gamma,freq,GenoProbList)
 			#prob SNPint comes top
-			if (max(est_z_score)<z_score_sig){
+			if (max(abs(est_z_score))<z_score_sig){
 				prob_SNPint_top[ii,jj]<-0
 			} else if(bound_prob_top(est_z_score[which(snps==SNPint)],max(est_z_score),LD[which.max(est_z_score),which(snps==SNPint)])<0.1){
 				prob_SNPint_top[ii,jj]<-0
