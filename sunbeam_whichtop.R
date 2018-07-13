@@ -18,7 +18,7 @@
 #'@param col_list Which colours to use in the plot
 #'@return a sunbeam plot showing lowest expected p-value SNPs
 #'@author Mary Fortune
-sunbeam_whichtop<-function(CV1,CV2,Tag,N0,N1,gammatrue,LD,freq,ORmax=1,ORgrid=0.05,z_score_sig=-qnorm((0.1)/2),col_list=c('white', 'firebrick1', 'firebrick4', 'gold','blue')){
+sunbeam_whichtop<-function(CV1,CV2,Tag,N0,N1,gammatrue,LD,freq,ORmax=1,ORgrid=0.005,z_score_sig=-qnorm((0.1)/2),col_list=c('white', 'firebrick1', 'firebrick4', 'gold','blue')){
 	#get the SNP names
 	snps<-colnames(freq)[-ncol(freq)]
 	#check that the same SNPs are present in the freq data, the LD matrix and the input SNPs
