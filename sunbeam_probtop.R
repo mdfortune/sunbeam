@@ -54,9 +54,9 @@ sunbeam_probtop<-function(CV1,CV2,SNPint,N0,N1,gammatrue,LD,freq,ORmax=1,ORgrid=
 	#which colour will correspond to SNPint being top
 	col.l <- colorRampPalette(col_list)
 	#we only want to label the plot at a subset of points
-	subset<-which(abs(round(gamma_list,1)-gamma_list)<0.001)
+	subset<-which(abs(round(gamma_list/2,1)-gamma_list/2)<0.001)
 	#make the plot, including a point corresponding to gammatrue
-	levelplot(prob_SNPint_top,scales=list(x=list(at=subset, labels=gamma_list[subset]),y=list(at=subset, labels=gamma_list[subset])),xlab=list("log OR for CV1",cex=1.5),ylab=list("log OR for CV2",cex=1.5),col.regions=col.l,panel = function(...){
+	levelplot(prob_SNPint_top,scales=list(x=list(at=subset, labels=gamma_list[subset],cex=1.5),y=list(at=subset, labels=gamma_list[subset],cex=1.5)),xlab=list("log OR for CV1",cex=1.5),ylab=list("log OR for CV2",cex=1.5),col.regions=col.l,panel = function(...){
 		panel.levelplot(...)
 		panel.abline(h = which(gamma_list==0))
             	panel.abline(v = which(gamma_list==0))
