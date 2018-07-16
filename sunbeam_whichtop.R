@@ -58,9 +58,9 @@ sunbeam_whichtop<-function(CV1,CV2,Tag,N0,N1,gammatrue,LD,freq,ORmax=1,ORgrid=0.
 	#which colour will correspond to each SNP being top
 	col.l <- colorRampPalette(col_list[1:(max(top_SNP)+1)])
 	#we only want to label the plot at a subset of points
-	subset<-which(abs(round(gamma_list,1)-gamma_list)<0.001)
+	subset<-which(abs(round(gamma_list/2,1)-gamma_list/2)<0.001)
 	#make the plot, including a point corresponding to gammatrue
-	levelplot(top_SNP,scales=list(x=list(at=subset, labels=gamma_list[subset]),y=list(at=subset, labels=gamma_list[subset])),xlab=list("log OR for CV1",cex=1.5),ylab=list("log OR for CV2",cex=1.5),col.regions=col.l,colorkey=FALSE, 		panel = function(...){
+	levelplot(top_SNP,scales=list(x=list(at=subset, labels=gamma_list[subset],cex=1.5),y=list(at=subset, labels=gamma_list[subset],cex=1.5)),xlab=list("log OR for CV1",cex=1.5),ylab=list("log OR for CV2",cex=1.5),col.regions=col.l,colorkey=FALSE, 		panel = function(...){
 		panel.levelplot(...)
 		panel.abline(h = which(gamma_list==0))
             	panel.abline(v = which(gamma_list==0))
